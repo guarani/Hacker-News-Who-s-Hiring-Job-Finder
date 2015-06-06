@@ -5,6 +5,22 @@ var previousBackgroundColor;
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
 
+        // Add the counter.
+        var counter = document.getElementById('pvs-counter');
+        if (counter === null) {
+            counter = document.createElement('div');
+            counter.id = 'pvs-counter';
+            counter.style.backgroundColor = 'black';
+            counter.style.font = 'monospace'
+            counter.style.position = 'fixed';
+            counter.style.top = '30px';
+            counter.style.left = '30px';
+            counter.style.color = '#00FF00';
+            document.getElementsByTagName('body')[0].appendChild(counter);
+        } else {
+            counter.innerHTML = '';
+        }
+
         results = [];
         current = undefined;
 
@@ -55,11 +71,16 @@ chrome.runtime.onMessage.addListener(
         }
 
         function goToNext() {
-            current++;
+            if (current === undefined) {
+                current = 0;
+            } else {                
+                current++;
+            }
             if (current === results.length - 1) {
                 current = 0;
             }
             results[current].scrollIntoView();
+            counter.innerHTML = current + 1 + ' of ' + results.length; 
         }
 
         function goToPrevious() {
@@ -68,6 +89,7 @@ chrome.runtime.onMessage.addListener(
                 current = results.length - 1;
             }
             results[current].scrollIntoView();
+            counter.innerHTML = current + 1 + ' of ' + results.length; 
         }
 
         // Allow navigation through the results via the arrow and Enter keys.
@@ -84,6 +106,7 @@ chrome.runtime.onMessage.addListener(
             }
             // If Escape, clear search.
             else if (e.keyCode == '27') {
+                counter.remove();
                 clearSearch();
             }
         };
@@ -92,7 +115,6 @@ chrome.runtime.onMessage.addListener(
         if (results.length === 0) {
             alert('No results.');
         } else {
-            current = 0;
             goToNext();
         }
     }
