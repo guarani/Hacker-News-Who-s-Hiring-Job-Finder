@@ -117,5 +117,25 @@ chrome.runtime.onMessage.addListener(
         } else {
             goToNext();
         }
+
+        // Fix links (removing <b> tags) on click
+        function interceptClickEvent(e) {
+            var href;
+            var target = e.target || e.srcElement;
+            if (target.tagName === 'A') {
+                href = target.getAttribute('href');
+
+                var fixedUrl = href.replace(/\<b\>|\<\/b\>/g, '');
+
+                window.location.href = fixedUrl; // go to the fixed url
+                e.preventDefault(); // cancel the original click
+            }
+        }
+        //listen for link click events at the document level
+        if (document.addEventListener) {
+            document.addEventListener('click', interceptClickEvent);
+        } else if (document.attachEvent) {
+            document.attachEvent('onclick', interceptClickEvent);
+        }
     }
 );
